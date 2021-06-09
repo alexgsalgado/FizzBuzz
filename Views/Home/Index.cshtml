@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Fizz Buzz";
+}
+
+<div class="container">
+    <div class="row jumbotron">
+        <h1>Fizz Buzz - Alex Salgado</h1>
+        <div class="col-xs-6">
+            <p stye="font-size:12px;">
+                <h4>Fizz Buzz Explained</h4>
+                <br />1.	If the value is a multiple of 3 then output the word “Fizz”
+                <br />2.	If the value is a multiple of 5 then output the word “Buzz”
+                <br />3.	If the value is divisible by both 3 and 5 then output the word “FizzBuzz”
+                <br />4.	At the end of the run the program should display each division that was performed.
+                <br />
+                <br />Sample input:
+                <br />[1, 3, 5 , , 15, A, 23]
+                <br />
+                <br />Sample Output:
+                <br />Divided 1 by 3
+                <br />Divided 1 by 5
+                <br />Fizz
+                <br />Buzz
+                <br />Invalid Item
+                <br />FizzBuzz
+                <br />Invalid Item
+                <br />Divided 23 by 3
+                <br />Divided 23 by 5
+            </p>
+        </div>
+        <div class="col-xs-6" style="border-left: dashed 7px yellow;">
+
+            <h4>Fizz Buzz Implementation</h4>
+
+            <div style="display: block;">
+                <p style="font-size:12px;">
+                    For the sake of this UI, you'll need to enter your collection as a string.
+                    Ex: <em>1,2,3,4,5,6,$,,BestBuy</em>
+                </p>
+                <div class="form-group">
+                    <label>Input / Collection:</label>
+                    <input type="text" id="userlist" tabindex="1" class="form-control" placeholder="1,2,Best,Buy,BestBUY,8,13,5,15">
+                </div>
+
+                <button class="btn btn-default" onclick="RunFizzBuzz()" id="#RunFizzBuzz">
+                    Run Fizz Buzz!
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                </button>
+
+                <h4>Output</h4>
+                <div id="output-text" style="min-height:200px; border-bottom:solid 4px black">
+
+                </div>
+
+
+                <h4>Input / Output Table</h4>
+
+                <div>
+                    <table class="table table-striped table-responsive table-hover" id="output-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Input</th>
+                                <th scope="col">Output</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script type="text/javascript">
+        function RunFizzBuzz()
+        {
+            $("#output-table tbody").empty();
+            $("#output-text").empty();
+
+            var input = $("#userlist").val();
+            if (input.length > 0) {
+                var actionURL = '@Url.Action("RunFizzBuzz")?UserInput=' + encodeURIComponent(input);
+                $.ajax({
+                    type: 'GET',
+                    url: actionURL,
+                    dataType: 'json',
+                    success: function (data) {
+                        var inputs = data.fizzBuzzItems;
+                        var outputs = data.results;
+                        var table = $("#output-table");
+                        for (var i = 0; i < outputs.length; i++) {
+                            var row = "<tr>"
+                                + "<td>" + inputs[i] + "</td>"
+                                + "<td>" + outputs[i] + "</td>"
+                                + "</tr>";
+                            $("#output-table tbody").append(row);
+
+
+                            if (outputs[i].includes("<br />")) {
+
+                                var tempOutput = outputs[i].split("<br />");
+
+                                var outputParagraph = document.createElement("p");
+                                outputParagraph.style.cssText = 'font-size:12px; margin:0;'
+                                var outputDialog = document.createTextNode(tempOutput[0]);
+                                outputParagraph.appendChild(outputDialog);
+                                document.getElementById("output-text").appendChild(outputParagraph);
+
+                                outputParagraph = document.createElement("p");
+                                outputParagraph.style.cssText = 'font-size:12px; margin:0;'
+                                outputDialog = document.createTextNode(tempOutput[1]);
+                                outputParagraph.appendChild(outputDialog);
+                                document.getElementById("output-text").appendChild(outputParagraph);
+
+                            }
+                            else {
+
+                                var outputParagraph = document.createElement("p");
+                                outputParagraph.style.cssText = 'font-size:12px; margin:0;'
+                                var outputDialog = document.createTextNode(outputs[i]);
+                                outputParagraph.appendChild(outputDialog);
+                                document.getElementById("output-text").appendChild(outputParagraph);
+
+                            }
+                        }
+
+                    },
+                    error: function (ex) {
+                        window.alert(ex);
+                    }
+                });
+            }
+            else {
+                window.alert("There is nothing to Fizz nor to Buzz.")
+            }
+        }
+    </script>
+
+}
